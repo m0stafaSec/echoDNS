@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import certifi
 import dns.resolver
 import requests
 import argparse
@@ -68,13 +69,13 @@ def queryDNSOverHTTPS(domain, recordType=None, baseurl=None):
 
     # Default baseurl if not provided
     if not baseurl:
-        baseurl = "https://dns.google/resolve"
+        baseurl = " https://cloudflare-dns.com/dns-query"
 
 
     for record in recordList:
         url = f"{baseurl}?name={domain}&type={record}"
         try:
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, verify=certifi.where())
             response.raise_for_status()
             data = response.json()
             if "Answer" not in data:
