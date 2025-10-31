@@ -18,7 +18,7 @@ def printBanner():
     print(f"{Fore.CYAN}{banner}{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}A Comprehensive DNS Query Tool{Style.RESET_ALL}\n")
     print(f"{Fore.MAGENTA}Developed by Mostafa Shaaban{Style.RESET_ALL}\n")
-    print(f"{Fore.MAGENTA}V1.0{Style.RESET_ALL}\n")
+    print(f"{Fore.MAGENTA}V1.1{Style.RESET_ALL}\n")
 
 
 
@@ -147,19 +147,45 @@ def performAXFR(domain, nameserver):
         print("    → Traceback (most recent call last):")
         traceback.print_exc()
 
+def reverseDNS(ipAddress, dnsServer=None):
+    resolver = dns.resolver.Resolver()
+    if dnsServer:
+        resolver.nameservers = [dnsServer]
+    try:
+        reversedDomain = dns.reversename.from_address(ipAddress)
+        answers = resolver.resolve(reversedDomain, "PTR")
+        print(f"\nPTR records for {ipAddress}:")
+        for rdata in answers:
+            print(f"\033[92mPTR     \033[0m | {rdata.to_text()}")
+        return answers
+    except dns.resolver.NoAnswer:
+        print(f"\033[93mNo PTR record found for {ipAddress}\033[0m")
+    except dns.resolver.NXDOMAIN:
+        print(f"\033[91mNo such IP address: {ipAddress}\033[0m")
+    except Exception as e:
+        print(f"\033[91mError querying PTR record: {e}\033[0m")
+
+
 # Main entry point
 if __name__ == "__main__":
     printBanner()
     parser = argparse.ArgumentParser(description="EchoDNS Tool")
-    parser.add_argument("-d", "--domain", nargs='+', help="Domain(s) to query", required=True)
-    parser.add_argument("-t", "--type", help="Type of DNS record to query (e.g., A, MX, CNAME), default is all types")
-    parser.add_argument("--doh", action="store_true", help="Use DNS over HTTPS (DoH)")
-    parser.add_argument("-s", "--server", help="Specify DNS server to use", default=None)
-    parser.add_argument("--axfr", action="store_true", help="Perform AXFR from specified nameserver")
-    parser.add_argument("--baseurl", help="Base URL for DoH server - e.g. https://dns.google/resolve", default=None)
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("-d", "--domain", nargs='+', help="Domain(s) to query")
+group.add_argument("-r", "--reverse", nargs='+', help="IP address(es) for reverse DNS lookup")
 
-    args = parser.parse_args()
+parser.add_argument("-t", "--type", help="Type of DNS record to query (e.g., A, MX, CNAME), default is all types")
+parser.add_argument("--doh", action="store_true", help="Use DNS over HTTPS (DoH)")
+parser.add_argument("-s", "--server", help="Specify DNS server to use", default=None)
+parser.add_argument("--axfr", action="store_true", help="Perform AXFR from specified nameserver")
+parser.add_argument("--baseurl", help="Base URL for DoH server - e.g. https://dns.google/resolve", default=None)
 
+args = parser.parse_args()
+
+if args.reverse:
+    for ip in args.reverse:
+        reverseDNS(ip, args.server)
+else:
     for domain in args.domain:
         if args.axfr:
             if not args.server:
@@ -170,3 +196,4 @@ if __name__ == "__main__":
             queryDNSOverHTTPS(domain, args.type, args.baseurl)
         else:
             queryDNS(domain, args.type, args.server, args.doh, args.baseurl)
+
