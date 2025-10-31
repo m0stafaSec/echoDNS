@@ -7,8 +7,10 @@ A comprehensive DNS query tool with support for DNS over HTTPS (DoH), AXFR, and 
 
 To install the required dependencies, run the following command:
 
-```bash
-pip install -r requirements.txt
+```bash 
+# On debian/ubuntu based distro
+pip install -r requirements.txt --break-system-packages
+
 ```
 
 ## Usage
