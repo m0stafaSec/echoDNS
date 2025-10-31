@@ -69,7 +69,7 @@ def queryDNSOverHTTPS(domain, recordType=None, baseurl=None):
 
     # Default baseurl if not provided
     if not baseurl:
-        baseurl = " https://cloudflare-dns.com/dns-query"
+        baseurl = "https://dns.google/resolve"
 
 
     for record in recordList:

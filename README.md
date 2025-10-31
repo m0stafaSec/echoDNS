@@ -88,3 +88,8 @@ echoDNS -d google.com
 ```bash
 echoDNS -r 1.1.1.1
 ```
+
+### ⚠️ Ethical Use Warning:  
+The AXFR (Zone Transfer) feature in this tool is intended strictly for authorized security testing, research, or educational purposes.  
+Performing AXFR queries against domains or nameservers without explicit permission from the owner or administrator is considered unauthorized access and may violate laws or regulations in your jurisdiction.  
+Always ensure you have proper authorization before using this feature on any live system.
